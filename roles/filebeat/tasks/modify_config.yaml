@@ -1,0 +1,8 @@
+- name: Set customer_name a {{ customer_id }} #cambiamos la linea del customer para que ponga el del cliente al que le metemos la configuracion
+  #Hay que añadir en el ientario la variable cutomer_id
+  lineinfile:
+    dest: "{{ config_destino }}"
+    state: present
+    #regexp: 'customer: "casinobarcelona"'
+    regexp: '        customer: "casinobarcelona"'
+    line: '        customer: "{{ customer_id }}"'

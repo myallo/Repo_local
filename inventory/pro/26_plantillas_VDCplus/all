@@ -1,0 +1,23 @@
+[plantillasvdcplus:children]
+dbservers
+webservers
+
+[dbservers:children]
+dbmaster
+dbslaves
+
+[webservers]
+www1-plantvdc+ ansible_host=185.190.108.158 ansible_port=2222
+
+[plantillasvdcplus_dbmaster]
+dbmater-plantvdc+ ansible_host=185.190.108.158  ansible_port=2223
+
+[plantillasvdcplus_dbslaves]
+dbslave1-plantvdc+ ansible_host=185.190.108.158 ansible_port=2224
+dbslave2-plantvdc+ ansible_host=185.190.108.158 ansible_port=2225
+
+[all:vars]
+vm_vapp_name = PRE_Y_PLANTILLAS
+vm_edge_gateway_name = EDGE_PREPRODUCCION
+tenant = PRE_Y_PLANTILLAS
+ansible_python_interpreter = /usr/bin/python3

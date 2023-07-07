@@ -1,0 +1,7 @@
+---
+- name: Install {{ aplicacion }}
+  ansible.builtin.yum:
+    #name: filebeat-{{ version_app }}
+    name: "{{ aplicacion }}"
+    #state: present 
+    state: latest 

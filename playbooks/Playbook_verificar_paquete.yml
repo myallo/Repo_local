@@ -1,0 +1,17 @@
+---
+- hosts: all
+  #connection: local # When running locally
+  vars:
+    package_names:
+      - sudo
+  become: true
+  tasks:
+    - name: "Check if listed package is installed or not "
+      yum:
+        list="{{ package_names }}"
+      register: is_inistalled
+
+    - name: "Print execution results"
+      debug:
+        msg: "Package is installed"
+      when: is_inistalled is succeeded

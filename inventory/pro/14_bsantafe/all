@@ -1,0 +1,23 @@
+[bsantafe:children]
+dbservers
+webservers
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+webserver1-bsantafe ansible_host=185.190.108.250  ansible_port=22
+
+
+[dbmasters]
+dbmaster-bsantafe ansible_host=185.190.108.251  ansible_port=22
+
+[dbslaves]
+dbslave1-bsantafe ansible_host=185.190.108.252  ansible_port=22
+dbslave2-bsantafe ansible_host=185.190.108.253 ansible_port=22
+
+[all:vars]
+vm_vapp_name = BOLDT_SANTAFE
+vm_edge_gateway_name = EDGE_BOLDT_SANTAFE
+tenant = BOLDT_SANTAFE

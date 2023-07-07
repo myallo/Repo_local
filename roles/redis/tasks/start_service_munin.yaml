@@ -1,0 +1,6 @@
+---
+- name: Start and enable {{ service_munin }}
+  ansible.builtin.systemd:
+    name: "{{ service_munin }}"
+    state: restarted
+    enabled: yes

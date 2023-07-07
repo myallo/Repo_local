@@ -1,0 +1,15 @@
+---
+# vars file for roles/node-exporter
+node_exporter_version: "1.4.0"
+node_exporter_bin: /usr/local/bin/node_exporter
+node_exporter_user: nodeexporter
+node_exporter_group: "{{ node_exporter_user }}"
+node_exporter_dir_conf: /etc/node_exporter
+
+ssl_cert_dir: /etc/ssl/certs
+node_exporter_ssl_key: "{{ssl_cert_dir}}/tecnalis_node_exporter.key"
+node_exporter_ssl_cert: "{{ssl_cert_dir}}/tecnalis_node_exporter.crt"
+node_exporter_ssl_csr: "{{ssl_cert_dir}}/tecnalis_node_exporter.csr"
+
+node_exporter_web_yml_conf: "{{node_exporter_dir_conf}}/web.yml"
+node_exporter_args: "--web.config={{node_exporter_web_yml_conf}}"

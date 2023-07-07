@@ -1,0 +1,22 @@
+[atlanticcpe:children]
+dbservers
+webservers
+
+[dbservers:children]
+dbmasters
+betsson_dbslaves
+
+[webservers]
+webserver1-atlanticcpe ansible_host=185.190.108.235  ansible_port=22
+
+[dbmasters]
+dbmaster-atlanticcpe ansible_host=185.190.108.236  ansible_port=22
+
+[dbslaves]
+dbslave1-atlanticcpe ansible_host=185.190.108.237  ansible_port=22
+dbslave2-atlanticcpe ansible_host=185.190.108.238 ansible_port=22
+
+[all:vars]
+vm_vapp_name = ATLANTIC_CITY
+vm_edge_gateway_name = EDGE_ATLANTIC
+tenant = ATLANTIC

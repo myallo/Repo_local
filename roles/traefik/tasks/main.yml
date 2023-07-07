@@ -1,0 +1,4 @@
+---
+# tasks file for roles/traefik
+
+# Don't forget to setcap setcap 'cap_net_bind_service=+ep' /usr/local/bin/traefik

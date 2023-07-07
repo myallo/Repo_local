@@ -1,0 +1,22 @@
+[1xbet:children]
+dbservers
+webservers
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+webserver1-1xbet ansible_host=188.210.217.196  ansible_port=22
+
+[dbmasters]
+dbmaster-1xbet ansible_host=188.210.217.197  ansible_port=22
+
+[dbslaves]
+dbslave1-1xbet ansible_host=188.210.217.198  ansible_port=22
+dbslave2-1xbet ansible_host=188.210.217.199  ansible_port=22
+
+[all:vars]
+vm_vapp_name = 1xBet PROD
+vm_edge_gateway_name = EDGE_1XBET
+tenant = 1XBET

@@ -1,0 +1,5 @@
+---
+- name: Install {{ aplicacion }} en {{ ip_server }}
+  ansible.builtin.yum:
+    name: "{{ aplicacion }}"
+    state: latest 

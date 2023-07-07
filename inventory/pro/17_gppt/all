@@ -1,0 +1,23 @@
+[gppt:children]
+dbservers
+webservers
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+webserver1-gppt ansible_host=185.190.108.136  ansible_port=22
+
+
+[dbmasters]
+dbmaster-gppt ansible_host=185.190.108.137  ansible_port=22
+
+[dbslaves]
+dbslave1-gppt ansible_host=185.190.108.138 ansible_port=22
+dbslave2-gppt ansible_host=185.190.108.139 ansible_port=22
+
+[all:vars]
+vm_vapp_name = GOLDENPARK-PORTUGAL
+vm_edge_gateway_name = EDGE_GP_PORTUGAL
+tenant = GOLDENPARK-PORTUGAL

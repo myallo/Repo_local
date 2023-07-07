@@ -1,0 +1,23 @@
+[ijuegos:children]
+dbservers
+webservers
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+webserver1-ijuegos ansible_host=185.190.108.160  ansible_port=22
+
+
+[dbmasters]
+dbmaster-ijuegos ansible_host=185.190.108.161  ansible_port=22
+
+[dbslaves]
+dbslave1-ijuegos ansible_host=185.190.108.162 ansible_port=22
+dbslave2-ijuegos ansible_host=185.190.108.163 ansible_port=22
+
+[all:vars]
+vm_vapp_name = COMAR-IJUEGO
+vm_edge_gateway_name = EDGE_COMAR
+tenant = COMAR-IJUEGO

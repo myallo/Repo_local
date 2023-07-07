@@ -1,0 +1,148 @@
+---
+#tasks file for roles/node-exporter
+- name: collect facts about system services
+  service_facts:
+  register: services_state
+
+- name: install python 3 dependencies (Oracle Linux)
+  yum:
+    name: 
+      - python3-cryptography
+    state: present
+  when: "ansible_distribution|string == 'OracleLinux' and ansible_distribution_major_version|string == '8'"
+
+- name: install python 3 dependencies (RHE Linux)
+  yum:
+    name: 
+      - python3-cryptography
+    state: present
+  when: "ansible_distribution|string == 'Red Hat Enterprise Linux' and ansible_distribution_major_version|string == '8'"
+
+- name: install python 3 dependencies (Centos)
+  yum:
+    name: 
+      - python36-cryptography
+    state: present
+  when: "ansible_distribution|string == 'CentOS' and ansible_distribution_major_version|string == '7'"
+
+- name: check if node exporter exist
+  stat:
+    path: "{{ node_exporter_bin }}"
+  register: __check_node_exporter_present
+
+- name: if node exporter exist get version
+  shell: "cat /etc/systemd/system/node_exporter.service | grep Version | sed s/'.*Version '//g"
+  register: __get_node_exporter_version
+  when: __check_node_exporter_present.stat.exists == true
+  changed_when: false
+
+- name: create node exporter user
+  user:
+    name: "{{ node_exporter_user }}"
+    append: true
+    shell: /usr/sbin/nologin
+    system: true
+    create_home: false
+    home: /
+
+- name: create node exporter config dir
+  file:
+    path: "{{ node_exporter_dir_conf }}"
+    state: directory
+    owner: "{{ node_exporter_user }}"
+    group: "{{ node_exporter_group }}"
+
+- name: download and unzip node exporter if not exist
+  unarchive:
+    src: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/node_exporter-{{ node_exporter_version }}.linux-{{ arch }}.tar.gz"
+    dest: /tmp/
+    remote_src: yes
+    validate_certs: false
+  when: __check_node_exporter_present.stat.exists == false or not __get_node_exporter_version.stdout == node_exporter_version
+
+- name: move the binary to the final destination
+  copy:
+    src: "/tmp/node_exporter-{{ node_exporter_version }}.linux-{{ arch }}/node_exporter"
+    dest: "{{ node_exporter_bin }}"
+    owner: "{{ node_exporter_user }}"
+    group: "{{ node_exporter_group }}"
+    mode: 0755
+    remote_src: yes
+  when: __check_node_exporter_present.stat.exists == false or not __get_node_exporter_version.stdout == node_exporter_version
+
+- name: Create private key (RSA, 4096 bits)
+  community.crypto.openssl_privatekey:
+    path: "{{node_exporter_ssl_key}}"
+
+- name: Create certificate signing request (CSR) for self-signed certificate
+  community.crypto.openssl_csr_pipe:
+    privatekey_path:  "{{node_exporter_ssl_key}}"
+    common_name: node_exporter.tecnalis.com
+    organization_name: Tecnalis
+    subject_alt_name:
+      - "DNS:node_exporter.tecnalis.com"
+  register: csr
+
+- name: Generate a Self Signed OpenSSL certificate
+  community.crypto.x509_certificate:
+    path: "{{node_exporter_ssl_cert}}"
+    csr_content: "{{ csr.csr }}"
+    privatekey_path: "{{node_exporter_ssl_key}}"
+    provider: selfsigned
+
+- name: create the tls conf for node exporter
+  template:
+    src: node_exporter_web.yml.j2
+    dest: "{{ node_exporter_web_yml_conf }}"
+    owner: "{{ node_exporter_user }}"
+    group: "{{ node_exporter_group }}"
+    mode: 0555
+
+- name: change cert files owner to node exporter
+  ansible.builtin.file:
+    path: '{{ item }}'
+    owner: "{{ node_exporter_user }}"
+    group: "{{ node_exporter_group }}"
+  loop:
+    - "{{node_exporter_ssl_cert}}"
+    - "{{node_exporter_ssl_key}}"
+
+- name: Apply new SELinux file context to filesystem
+  ansible.builtin.command: restorecon -rv {{node_exporter_bin}}
+
+- name: install service
+  template:
+    src: node_exporter.service.j2
+    dest: /usr/lib/systemd/system/node_exporter.service
+    owner: root
+    group: root
+    mode: 0755
+  notify: reload_daemon_and_restart_node_exporter
+
+- meta: flush_handlers
+
+- name: clean
+  file:
+    path: 
+      - /tmp/node_exporter-{{ node_exporter_version }}.linux-amd64/
+    state: absent
+
+- name: service always started
+  systemd:
+    name: node_exporter
+    state: started
+    enabled: yes
+
+- name: Open port if firewall is active
+  firewalld:
+      port: "9100/tcp"
+      permanent: yes
+      immediate: yes
+      offline: no
+      state: enabled
+  when: 
+      - ansible_facts.services['firewalld.service'].state == 'running'
+      - ansible_facts.services['firewalld.service'].status == 'enabled'
+
+- include_tasks: vcloud.yml
+  when: configure_vcloud is defined and configure_vcloud == true

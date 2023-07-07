@@ -1,0 +1,9 @@
+---
+- name: Add repository for {{ aplicacion }}
+  yum_repository:
+    name: elasticstack-8.x
+    description: elasticstack-repo8
+    baseurl: "{{ repo_url }}"
+    gpgcheck: 1
+    gpgkey: "{{ gpg_key }}"
+    enabled: 1

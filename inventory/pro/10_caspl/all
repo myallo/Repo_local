@@ -1,0 +1,29 @@
+[caspl:children]
+dbservers
+webservers
+sci
+
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+webserver1-caspl ansible_host=188.210.217.243  ansible_port=22
+
+[dbmasters]
+dbmaster-caspl ansible_host=1188.210.217.244  ansible_port=22
+
+[dbslaves]
+dbslave1-caspl ansible_host=188.210.217.245  ansible_port=22
+dbslave2-caspl ansible_host=188.210.217.246 ansible_port=22 
+dbslave3-caspl ansible_host=188.210.217.253 ansible_port=22 
+
+
+[sci]
+sci1-casp ansible_host=188.210.217.254  ansible_port=22
+
+[all:vars]
+vm_vapp_name = CasinoPlay PRO
+vm_edge_gateway_name = EDGE_CASINOPLAY
+tenant = CASINOPLAY

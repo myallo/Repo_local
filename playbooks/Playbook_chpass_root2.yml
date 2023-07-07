@@ -1,0 +1,26 @@
+### Explicación playbook: Este playbook se ha creado para la creacón de  'N' usuarios definidos en el fichero /etc/ansible/recursos/variables/vars2.yml que contendrá
+### tantas entradas como usuarios se deseen crear. las variables declaradas contendrán lo siguiente:
+### usuario: 'nombre_usuario' clave: 'valor clave pública usuario' También se define por defecto la creación del home y del fichero que alojará la clave pública.
+### Se pueden definir tantas variables como se deseen y reutilizar este playbook para futuras configuraciones.
+---
+- name: Change the root password
+  hosts: all
+  remote_user: ansible
+  become: yes
+  tasks:
+    - name: Unlock the Bitwarden vault
+      shell: bw unlock
+      register: bw_unlock
+      failed_when: bw_unlock.rc != 0
+
+    - name: Retrieve the password from Bitwarden
+      shell: bw get password pro-root | awk '{print $NF}'
+      register: bw_pass
+      when: bw_unlock.rc == 0
+
+    - name: Change the root password
+      ansible.builtin.user:
+        name: root
+        state: present
+        password: "{{ bw_pass.stdout  | password_hash('sha512') }}"
+

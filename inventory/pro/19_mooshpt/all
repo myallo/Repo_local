@@ -1,0 +1,26 @@
+[mooshpt:children]
+dbservers
+webservers
+gateways
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+webserver1-mooshpt ansible_host=185.190.108.181  ansible_port=22
+
+[gateways]
+gateway-mooshpt ansible_ssh_host=194.39.127.10 
+
+[dbmasters]
+dbmaster-mooshpt ansible_host=185.190.108.182  ansible_port=22
+
+[dbslaves]
+dbslave1-mooshpt ansible_host=185.190.108.183 ansible_port=22
+dbslave2-mooshpt ansible_host=185.190.108.184 ansible_port=22
+
+[all:vars]
+vm_vapp_name = MOOSH-PT
+vm_edge_gateway_name = EDGE_MOOSH-PORTUGAL
+tenant = MOOSH-PT

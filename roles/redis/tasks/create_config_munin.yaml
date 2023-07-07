@@ -1,0 +1,14 @@
+---
+- name: Copy {{ config_origen }}  usando {{ config_destino }}
+  copy:
+    src: "{{ config_origen }}"
+    dest: "{{ config_destino }}"
+- name: modify {{ config_destino }}  permissions
+  ansible.builtin.file:
+    path: "{{ config_destino }}"
+    mode: '0755' 
+- name: Create symbolic link -> ln -s {{ config_destino }} {{ munin_file }}
+  file:
+   src: "{{ config_destino }}"
+   dest: "{{ munin_file }}"
+   state: link

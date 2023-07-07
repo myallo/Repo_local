@@ -1,0 +1,26 @@
+[olimpope:children]
+dbservers
+webservers
+
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+www1-olimpope ansible_host=185.190.108.152  ansible_port=22
+www2-olimpope ansible_host=185.190.108.156  ansible_port=22
+www3-olimpope ansible_host=185.190.108.151  ansible_port=22
+
+
+[dbmasters]
+dbmaster-olimpope ansible_host=185.190.108.153  ansible_port=22
+
+[dbslaves]
+dbslave1-olimpope ansible_host=185.190.108.154 ansible_port=22
+dbslave2-olimpope ansible_host=185.190.108.155 ansible_port=22
+
+[all:vars]
+vm_vapp_name = OLIMPO
+vm_edge_gateway_name = EDGE_INTRALOTS
+tenant = OLIMPO

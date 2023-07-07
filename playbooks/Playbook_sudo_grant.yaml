@@ -1,0 +1,41 @@
+---
+ - name: Playbook_despliegue_usuario
+   hosts: all
+   remote_user: ansible
+   vars_files:
+       - "/etc/ansible/recursos/variables/usuarios_servicios.yml"
+   become: true
+   tasks:
+     - name: Ensure group "servicios" exists
+       ansible.builtin.group:
+         name: servicios
+         state: present
+
+     - name: addin users to group{{item.usuario}}
+       ansible.builtin.user:
+         name: "{{ item.usuario }}"
+         groups: servicios
+         append: true
+       with_items: "{{ user_details }}"
+
+     - name: Allow the group "servicios" to run sudo /bin/systemctl restart for httpd.service and tomcat9.services wihout a password
+       community.general.sudoers:
+         name: servicios-sudo
+         group: servicios
+         commands:
+           - /bin/systemctl restart httpd.service
+           - /bin/systemctl reload httpd.service
+           - /bin/systemctl start httpd.service
+           - /bin/systemctl stop httpd.service
+           - /bin/systemctl status httpd.service
+           - /BIn/systemctl graceful httpd.service
+           - /bin/vi /etc/httpd/conf.d/ssl.conf.online
+           - /etc/httpd/pagesonline.sh
+           - /etc/init.d/httpd start
+           - /etc/init.d/httpd stop
+           - /etc/init.d/httpd status
+           - /etc/init.d/httpd graceful
+           - /bin/su - tomcat
+           - /bin/su - tecnalisapp
+           - /bin/su - cbarnaapp
+         nopassword: true

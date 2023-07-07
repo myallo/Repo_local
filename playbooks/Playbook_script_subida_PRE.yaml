@@ -1,0 +1,35 @@
+---
+ - name: Copu script subidas a PRE
+   hosts: all
+   remote_user: ansible
+   vars:
+     config_origen: /etc/ansible/recursos/cp_files.sh
+     dir_destino: /home/jparedes/Subidas
+     config_destino: /home/jparedes/Subidas/cp_files.sh
+   become: true
+   tasks:
+   - block:
+     - name: Check dir
+       stat:
+         path: "{{ dir_destino }}"
+       register: directory_data
+     - name: "echo if directory already existed"
+       debug:
+         msg: "{{ dir_destino }} directory is already existed"
+       when: directory_data.stat.exists
+     - name: create dir if it doesn't exist
+       ansible.builtin.file:
+         path: "{{ dir_destino }}"
+         state: directory
+         mode: '0755'      
+         owner: jparedes
+         group: jparedes
+       when: not directory_data.stat.exists
+     - name: copiamos {{ config_origen }}  a {{ dir_destino }}
+       ansible.builtin.copy:
+         src: "{{ config_origen }}"
+         dest: "{{ config_destino }}"
+         mode: '0744'        
+         owner: jparedes
+         group: jparedes
+         backup: yes

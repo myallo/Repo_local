@@ -1,0 +1,19 @@
+---
+- name: Obtención de usuarios presentes en el sistema
+  hosts: all
+  remote_user: ansible
+  gather_facts: true
+  become: no
+  tasks:
+  - name: Usando getent para reunir información
+    getent:
+      database: passwd
+      split: ':'
+
+  - debug:
+      var: getent_passwd
+
+  - name: Print the usernames
+    debug:
+      msg: "{{ getent_passwd | dict2items | json_query('[? contains(value,`/bin/bash`)].key') | list }}"
+#      msg: "{{ getent_passwd | dict2items | map(attribute='key') | list }}"

@@ -1,0 +1,22 @@
+[acones:children]
+dbservers
+webservers
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+webserver1-acones ansible_host=188.210.218.194  ansible_port=22
+
+[dbmasters]
+dbmaster-acones ansible_host=188.210.218.195  ansible_port=22
+
+[dbslaves]
+dbslave1-acones ansible_host=188.210.218.196  ansible_port=22
+dbslave2-acones ansible_host=188.210.218.197  ansible_port=22
+
+[all:vars]
+vm_vapp_name = Aconcagua PROD
+vm_edge_gateway_name = EDGE_ACONCAGUA
+tenant = ACONCAGUA

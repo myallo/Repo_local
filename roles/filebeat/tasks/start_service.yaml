@@ -1,0 +1,6 @@
+---
+- name: Start and enable {{ service }}
+  ansible.builtin.systemd:
+    name: "{{ service }}"
+    state: restarted
+    enabled: yes

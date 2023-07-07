@@ -1,0 +1,6 @@
+---
+- name: Start and enable {{ service_redis }}
+  ansible.builtin.systemd:
+    name: "{{ service_redis }}"
+    state: restarted
+    enabled: yes

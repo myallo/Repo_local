@@ -1,0 +1,22 @@
+[betsson:children]
+dbservers
+webservers
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+webserver1-betsson ansible_host=185.76.215.86  ansible_port=22
+
+[dbmaster]
+dbmaster-betsson ansible_host=185.76.215.87  ansible_port=22
+
+[dbslaves]
+dbslave1-betsson ansible_host=185.76.215.88  ansible_port=22
+dbslave2-betsson ansible_host=185.76.215.89 ansible_port=22
+
+[all:vars]
+vm_vapp_name = BETSSON PROD
+vm_edge_gateway_name = EDGE_BETSSON
+tenant = BETSSON

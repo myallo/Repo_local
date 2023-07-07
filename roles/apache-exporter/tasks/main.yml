@@ -1,0 +1,146 @@
+---
+# tasks file for roles/apache-exporter
+- name: collect facts about system services
+  service_facts:
+  register: services_state
+  
+# add user to database
+- name: install python 3 dependencies (Oracle Linux 8)
+  yum:
+    name: 
+      - python3-cryptography
+    state: present
+  when: "ansible_distribution|string == 'OracleLinux' and ansible_distribution_major_version|string == '8'"
+
+- name: install python 3 dependencies (Centos 7)
+  yum:
+    name: 
+      - python36-cryptography
+    state: present
+  when: "ansible_distribution|string == 'CentOS' and ansible_distribution_major_version|string == '7'"
+
+- name: enable Apache server status mod
+  template:
+    src: apache_exporter_server-status.j2
+    dest: /etc/httpd/conf.d/server-status.conf
+    owner: root
+    group: root
+    mode: 0755
+ 
+# install the exporter
+- name: check if apache exporter exist
+  stat:
+    path: "{{ apache_exporter_bin }}"
+  register: __check_apache_exporter_present
+
+- name: if apache exporter exist get version
+  shell: "cat /etc/systemd/system/apache_exporter.service | grep Version | sed s/'.*Version '//g"
+  register: __get_apache_exporter_version
+  when: __check_apache_exporter_present.stat.exists == true
+  changed_when: false
+
+- name: create apache exporter user
+  user:
+    name: "{{ apache_exporter_user }}"
+    append: true
+    shell: /usr/sbin/nologin
+    system: true
+    create_home: false
+    home: /
+
+- name: create apache exporter config dir
+  file:
+    path: "{{ apache_exporter_dir_conf }}"
+    state: directory
+    owner: "{{ apache_exporter_user }}"
+    group: "{{ apache_exporter_group }}"
+
+- name: download and unzip apache exporter if not exist
+  unarchive:
+    src: "https://github.com/Lusitaniae/apache_exporter/releases/download/v{{ apache_exporter_version }}/apache_exporter-{{ apache_exporter_version }}.linux-{{ arch }}.tar.gz"
+    dest: /tmp/
+    remote_src: yes
+    validate_certs: false
+  when: __check_apache_exporter_present.stat.exists == false or not __get_apache_exporter_version.stdout == apache_exporter_version
+
+- name: move the binary to the final destination
+  copy:
+    src: "/tmp/apache_exporter-{{ apache_exporter_version }}.linux-{{ arch }}/apache_exporter"
+    dest: "{{ apache_exporter_bin }}"
+    owner: "{{ apache_exporter_user }}"
+    group: "{{ apache_exporter_group }}"
+    mode: 0755
+    remote_src: yes
+  when: __check_apache_exporter_present.stat.exists == false or not __get_apache_exporter_version.stdout == apache_exporter_version
+
+- name: Create private key (RSA, 4096 bits)
+  community.crypto.openssl_privatekey:
+    path: "{{apache_exporter_ssl_key}}"
+
+- name: Create certificate signing request (CSR) for self-signed certificate
+  community.crypto.openssl_csr_pipe:
+    privatekey_path:  "{{apache_exporter_ssl_key}}"
+    common_name: apache_exporter.tecnalis.com
+    organization_name: Tecnalis
+    subject_alt_name:
+      - "DNS:apache_exporter.tecnalis.com"
+  register: csr
+
+- name: Generate a Self Signed OpenSSL certificate
+  community.crypto.x509_certificate:
+    path: "{{apache_exporter_ssl_cert}}"
+    csr_content: "{{ csr.csr }}"
+    privatekey_path: "{{apache_exporter_ssl_key}}"
+    provider: selfsigned
+
+- name: create the tls conf for apache exporter
+  template:
+    src: apache_exporter_web.yml.j2
+    dest: "{{ apache_exporter_web_yml_conf }}"
+    owner: "{{ apache_exporter_user }}"
+    group: "{{ apache_exporter_group }}"
+    mode: 0555
+
+- name: change cert files owner to apache exporter
+  ansible.builtin.file:
+    path: '{{ item }}'
+    owner: "{{ apache_exporter_user }}"
+    group: "{{ apache_exporter_group }}"
+  loop:
+    - "{{apache_exporter_ssl_cert}}"
+    - "{{apache_exporter_ssl_key}}"
+
+- name: Apply new SELinux file context to filesystem
+  ansible.builtin.command: restorecon -rv {{apache_exporter_bin}}
+
+
+- name: install service
+  template:
+    src: apache_exporter.service.j2
+    dest: /usr/lib/systemd/system/apache_exporter.service
+    owner: root
+    group: root
+    mode: 0755
+  notify: reload_daemon_and_restart_apache_exporter
+
+- meta: flush_handlers
+
+- name: service always started
+  systemd:
+    name: apache_exporter
+    state: started
+    enabled: yes
+
+- name: Open port if firewall is active
+  firewalld:
+      port: "9117/tcp"
+      permanent: yes
+      immediate: yes
+      offline: no
+      state: enabled
+  when: 
+      - ansible_facts.services['firewalld.service'].state == 'running'
+      - ansible_facts.services['firewalld.service'].status == 'enabled'
+
+- include_tasks: vcloud.yml
+  when: configure_vcloud is defined and configure_vcloud == true

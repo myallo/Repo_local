@@ -1,0 +1,17 @@
+### Este Playbook copia un script en la máquina o grupo de máquinas donde se ejecute para la actualización por comando de python.
+---
+ - name: Instalar python
+   hosts: all
+   user: ansible
+   become: true
+   gather_facts: no
+   tasks:
+   - name: copiar script
+     ansible.builtin.copy:
+       src: /etc/ansible/recursos/instalar_python.sh
+       dest: /tmp/instalar_python.sh
+       owner: ansible
+       group: ansible
+       mode: '0775'
+   - name: instalar python
+     command: sh /tmp/instalar_python.sh 

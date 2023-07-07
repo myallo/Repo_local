@@ -1,0 +1,18 @@
+---
+# vars file for roles/http-exporter
+apache_exporter_version: "0.11.0"
+apache_exporter_bin: /usr/local/bin/apache_exporter
+apache_exporter_user: apachexporter
+apache_exporter_group: "{{ apache_exporter_user }}"
+apache_exporter_dir_conf: /etc/apache_exporter
+apache_exporter_httpd_conf: /etc/apache_exporter
+
+ssl_cert_dir: /etc/ssl/certs
+apache_exporter_ssl_key: "{{ssl_cert_dir}}/tecnalis_http_exporter.key"
+apache_exporter_ssl_cert: "{{ssl_cert_dir}}/tecnalis_http_exporter.crt"
+apache_exporter_ssl_csr: "{{ssl_cert_dir}}/tecnalis_http_exporter.csr"
+
+apache_exporter_web_yml_conf: "{{apache_exporter_dir_conf}}/web.yml"
+apache_exporter_args: "--web.config={{apache_exporter_web_yml_conf}}"
+
+apache_exporter_server-status.conf: "{{apache_exporter_httpd_conf}}/server-status.conf"

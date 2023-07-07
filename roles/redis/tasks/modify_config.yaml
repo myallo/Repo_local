@@ -1,0 +1,8 @@
+- name: Add IP ens192 {{ ip_server }} en {{ config_destino }}
+#Añadimos en la configuracion de redis la ip local del webserver
+  lineinfile:
+    dest: "{{ config_destino }}"
+    state: present
+    regexp: 'bind 127.0.0.1' 
+    line: 'bind 127.0.0.1 {{ ip_server }}'
+    backup: yes

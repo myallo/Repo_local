@@ -1,0 +1,14 @@
+---
+ - name: Playbook_baja_usuario
+   hosts: all
+   remote_user: ansible
+   vars_files:
+       - "/etc/ansible/recursos/variables/baja_usuarios.yml"
+   become: true
+   tasks:
+     - name: borrar_usuario_{{item.usuario}}
+       ansible.builtin.user:
+         name: "{{ item.usuario }}"
+         state: "absent"
+         remove: true
+       with_items: "{{ user_details }}"

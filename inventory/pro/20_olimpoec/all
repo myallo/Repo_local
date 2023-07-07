@@ -1,0 +1,24 @@
+[olimpoec:children]
+dbservers
+webservers
+
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+www1-olimpoec ansible_host=185.190.108.175  ansible_port=22
+
+
+[dbmasters]
+dbmaster-olimpoec ansible_host=185.190.108.176  ansible_port=22
+
+[dbslaves]
+dbslave1-olimpoec ansible_host=185.190.108.177 ansible_port=22
+dbslave2-olimpoec ansible_host=185.190.108.178 ansible_port=22
+
+[all:vars]
+vm_vapp_name = OLIMPO-ECUADOR
+vm_edge_gateway_name = EDGE_OLIMPO_ECUADOR
+tenant = OLIMPO-ECUADOR

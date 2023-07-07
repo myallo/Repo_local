@@ -1,0 +1,8 @@
+---
+# handlers file for roles/apache2-exporter
+- name: reload_daemon_and_restart_apache_exporter
+  systemd:
+    name: apache_exporter
+    state: restarted
+    enabled: yes
+    daemon_reload: yes

@@ -1,0 +1,15 @@
+[Unit]
+Description=mysql Exporter Version {{ mysqld_exporter_version }}
+After=network-online.target
+
+[Service]
+User={{ mysqld_exporter_user }}
+Group={{ mysqld_exporter_group }}
+Type=simple
+ExecStart={{ mysqld_exporter_bin }} {{ mysqld_exporter_args }}
+EnvironmentFile= {{ mysqld_exporter_env_conf }}
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,6 @@
+---
+- name: Copy {{ service_origen }} a {{ service_destino }}
+  copy:
+    src: "{{ service_origen }}"
+    dest: "{{ service_destino }}"
+    mode: '755'

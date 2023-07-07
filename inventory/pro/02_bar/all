@@ -1,0 +1,23 @@
+[bar:children]
+dbservers
+webservers
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[dbmasters]
+dbmaster-bar ansible_ssh_host=185.76.215.70 replication_address=192.168.2.2
+
+[dbslaves]
+dbslave1-bar ansible_ssh_host=185.76.215.71 replication_address=192.168.2.2
+dbslave2-bar ansible_ssh_host=185.76.215.72 replication_address=192.168.2.3
+dbslave3-bar ansible_ssh_host=185.76.215.73 replication_address=192.168.2.4
+
+[webservers]
+webserver1-bar ansible_ssh_host=185.76.215.69
+
+[all:vars]
+vm_vapp_name = BARCELONA PROD
+vm_edge_gateway_name = EDGE_BARCELONA
+tenant = BARCELONA

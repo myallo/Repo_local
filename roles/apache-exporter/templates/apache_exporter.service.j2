@@ -1,0 +1,14 @@
+[Unit]
+Description=Apache Exporter Version {{ apache_exporter_version }}
+After=network-online.target
+
+[Service]
+User={{ apache_exporter_user }}
+Group={{ apache_exporter_group }}
+Type=simple
+ExecStart={{ apache_exporter_bin }} {{ apache_exporter_args }}
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

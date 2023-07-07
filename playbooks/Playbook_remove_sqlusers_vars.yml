@@ -1,0 +1,17 @@
+---
+ - name: Playbook_remove_sqlusers
+   hosts: all
+   remote_user: ansible
+   vars_files:
+       - "/etc/ansible/recursos/variables/baja_sql_usuarios.yml"
+   become: true
+   tasks:
+     - name: borrar_usuario_{{item.usuario}}
+       mysql.user:
+         login_user: root
+         login_password: "{{ password }}" 
+         login_unix_socket: /var/run/mysqld/mysqld.sock
+         name: "{{ item.usuario }}"
+         host_all: yes
+         state: "absent"
+       with_items: "{{ user_details }}"

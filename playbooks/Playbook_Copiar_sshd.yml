@@ -1,0 +1,18 @@
+### Este playbook copia la configuración por defecto el entorno para la conexión ssh a todas las máquinas que se declaren
+---
+ - name: Desplegar configuracion sshd_config
+   hosts: all
+   user: ansible
+   become: true
+   tasks:
+   - name: Copiar fichero
+     ansible.builtin.copy:
+       src: /etc/ansible/recursos/sshd_config
+       dest: /etc/ssh/sshd_config
+       owner: root
+       group: root
+       mode: '0600'
+   - name: Reiniciar servicio sshd
+     ansible.builtin.service:
+       name: sshd
+       state: restarted

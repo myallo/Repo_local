@@ -1,0 +1,283 @@
+#
+# ¡IMPORTANTE! -> Editar el valor de processors > add fields > fields > customer con el nombre del cliente al que se le aplica esta configuración.
+#
+# Ej.  customer: "nuevo-nombre-de-cliente"
+#
+
+filebeat.inputs:
+- type: log
+  id: partner-website
+  enabled: true
+  ignore_older: 8h
+  close_inactive: 4h
+  clean_inactive: 48h
+  close_removed: true
+  close_renamed: false
+  paths:
+    - /logs/tomcat*/partner-website*.log
+  fields:
+    index_name: partner-website
+  tags: ["partner-website"]
+  multiline.type: pattern
+  multiline.pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+  multiline.negate: true
+  multiline.match: after
+  multiline.skip_newline: false
+  scan_frequency: 20s
+  exclude_files: ['\.[0-9]+\.log$','\.gz$']
+- type: log
+  id: batch-processing
+  enabled: true
+  ignore_older: 8h
+  close_inactive: 4h
+  clean_inactive: 48h
+  close_removed: true
+  close_renamed: false
+  paths:
+    - /logs/batch-processing/com.tecnalis.ogp.batchprocessing.*.log
+  fields:
+    index_name: batch-processing
+  tags: ["batch-processing"]
+  multiline.type: pattern
+  multiline.pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+  multiline.negate: true
+  multiline.match: after
+  multiline.skip_newline: false
+  scan_frequency: 120s
+  exclude_files: ['\.[0-9]+\.log$','\.gz$']
+- type: log
+  id: access-log
+  enabled: true
+  ignore_older: 8h
+  close_inactive: 4h
+  clean_inactive: 48h
+  close_removed: true
+  close_renamed: false
+  paths:
+    - /logs/tomcat*/*access*.log
+    - /logs/alira/*access*.log
+  fields:
+    index_name: access-log
+  tags: ["access-log"]
+  exclude_files: ['\.[0-9]+\.log$','\.gz$']
+
+- type: log
+  id: apache-access-log
+  enabled: true
+  ignore_older: 8h
+  close_inactive: 4h
+  clean_inactive: 48h
+  close_removed: true
+  close_renamed: false
+  paths:
+    - /logs/httpd*/*443-access_log*
+  fields:
+    index_name: apache-access-log
+  tags: ["apache-access-log"]
+  exclude_files: ['\.[0-9]+\.log$','\.gz$']
+- type: log
+  id: catalina-out
+  enabled: true
+  ignore_older: 8h
+  close_inactive: 4h
+  clean_inactive: 48h
+  close_removed: true
+  close_renamed: false
+  paths:
+    - /logs/tomcat*/*catalina*.out
+    - /logs/alira/*catalina*.out
+  fields:
+    index_name: catalina-out
+  tags: ["catalina-out"]
+  multiline.pattern: '^[a-zA-Z0-9]'
+  multiline.negate: true
+  multiline.match: after
+  exclude_files: ['\.[0-9]+\.log$','\.gz$']
+- type: log
+  id: apuestas
+  enabled: true
+  ignore_older: 8h
+  close_inactive: 4h
+  clean_inactive: 48h
+  close_removed: true
+  close_renamed: false
+  paths:
+    - /logs/tomcat*/*apuestas*.log
+  fields:
+    index_name: apuestas
+  tags: ["apuestas"]
+  multiline.type: pattern
+  multiline.pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+  multiline.negate: true
+  multiline.match: after
+  multiline.skip_newline: false
+  exclude_files: ['\.[0-9]+\.log$','\.gz$']
+- type: log
+  id: integrations
+  enabled: true
+  ignore_older: 8h
+  close_inactive: 4h
+  clean_inactive: 48h
+  close_removed: true
+  close_renamed: false
+  paths:
+    - /logs/tomcat*/*altenar*.log
+    - /logs/tomcat*/*amatic*.log
+    - /logs/tomcat*/*authenticgaming*.log
+    - /logs/tomcat*/*betonsoft*.log
+    - /logs/tomcat*/*betsoft*.log
+    - /logs/tomcat*/*booming*.log
+    - /logs/tomcat*/*booongo*.log
+    - /logs/tomcat*/*conceptgaming*.log
+    - /logs/tomcat*/*connective*.log
+    - /logs/tomcat*/*cq9*.log
+    - /logs/tomcat*/*ctgaming*.log
+    - /logs/tomcat*/*dbox*.log
+    - /logs/tomcat*/*edictGame*.log
+    - /logs/tomcat*/*egt-interactive*.log
+    - /logs/tomcat*/*amusnet*.log
+    - /logs/tomcat*/*endorphina*.log
+    - /logs/tomcat*/*espresso*.log
+    - /logs/tomcat*/*eurasian*.log
+    - /logs/tomcat*/*everymatrix*.log
+    - /logs/tomcat*/*evolution*.log
+    - /logs/tomcat*/*ezugi*.log
+    - /logs/tomcat*/*feelspin*.log
+    - /logs/tomcat*/*freshdeck*.log
+    - /logs/tomcat*/*gameart*.log
+    - /logs/tomcat*/*gaming1*.log
+    - /logs/tomcat*/*globalbet*.log
+    - /logs/tomcat*/*goldenrace*.log
+    - /logs/tomcat*/*habanero*.log
+    - /logs/tomcat*/*img-virtual*.log
+    - /logs/tomcat*/*isoftbet*.log
+    - /logs/tomcat*/*kajot*.log
+    - /logs/tomcat*/*kiron*.log
+    - /logs/tomcat*/*mascot*.log
+    - /logs/tomcat*/*mga*.log
+    - /logs/tomcat*/*microgaming*.log
+    - /logs/tomcat*/*mobilots*.log
+    - /logs/tomcat*/*netent*.log
+    - /logs/tomcat*/*novomatic*.log
+    - /logs/tomcat*/*nyx*.log
+    - /logs/tomcat*/*oryx*.log
+    - /logs/tomcat*/*pariplay*.log
+    - /logs/tomcat*/*patagonia*.log
+    - /logs/tomcat*/*playngo*.log
+    - /logs/tomcat*/*playson*.log
+    - /logs/tomcat*/*playtech*.log
+    - /logs/tomcat*/*pragmatic*.log
+    - /logs/tomcat*/*recreativasFranco*.log
+    - /logs/tomcat*/*redrake*.log
+    - /logs/tomcat*/*relaxgaming*.log
+    - /logs/tomcat*/*rival*.log
+    - /logs/tomcat*/*skywind*.log
+    - /logs/tomcat*/*spribe*.log
+    - /logs/tomcat*/*synot*.log
+    - /logs/tomcat*/*triplecherry*.log
+    - /logs/tomcat*/*wazdan*.log
+    - /logs/tomcat*/*worldmatch*.log
+    - /logs/tomcat*/*xprogaming*.log
+    - /logs/tomcat*/*yggdrasil*.log
+    - /logs/tomcat*/*zitro*.log
+  fields:
+    index_name: integrations
+  tags: ["integrations"]
+  multiline.type: pattern
+  multiline.pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+  multiline.negate: true
+  multiline.match: after
+  multiline.skip_newline: false
+  exclude_files: ['\.[0-9]+\.log$','\.gz$']
+- type: log
+  id: webhooks
+  enabled: true
+  ignore_older: 8h
+  close_inactive: 4h
+  clean_inactive: 48h
+  close_removed: true
+  close_renamed: false
+  paths:
+    - /logs/tomcat*/*webhooks*.log
+  fields:
+    index_name: webhooks
+  tags: ["webhooks"]
+  multiline.type: pattern
+  multiline.pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+  multiline.negate: true
+  multiline.match: after
+  multiline.skip_newline: false
+  exclude_files: ['\.[0-9]+\.log$','\.gz$']
+- type: log
+  id: alira
+  enabled: true
+  ignore_older: 8h
+  close_inactive: 4h
+  clean_inactive: 48h
+  close_removed: true
+  close_renamed: false
+  paths:
+    - /logs/alira/AHTML.log
+  fields:
+    index_name: alira
+  tags: ["alira"]
+  multiline.type: pattern
+  multiline.pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+  multiline.negate: true
+  multiline.match: after
+  multiline.skip_newline: false
+  exclude_files: ['\.[0-9]+\.log$','\.gz$']
+- type: log
+  id: rest-api
+  enabled: true
+  ignore_older: 8h
+  close_inactive: 4h
+  clean_inactive: 48h
+  close_removed: true
+  close_renamed: false
+  paths:
+    - /logs/tomcat*/*rest-api*.log
+  fields:
+    index_name: rest-api
+  tags: ["rest-api"]
+  multiline.type: pattern
+  multiline.pattern: '^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}'
+  multiline.negate: true
+  multiline.match: after
+  multiline.skip_newline: false
+  exclude_files: ['\.[0-9]+\.log$','\.gz$']
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        customer: "casinobarcelona"
+  - script:
+      lang: javascript
+      source: >
+        function process(event) {
+            var path = event.Get("log.file.path");
+
+            if (path) {
+                var parts = path.split("/");
+                var filename = parts[parts.length - 1];
+                event.Put("file_name", filename);
+            }
+        }
+path.data: /var/lib/filebeat_alira
+output.logstash:
+  hosts: ["18.132.189.208:5047"]
+  bulk_max_size: 4096
+  compression_level: 3
+  worker: 2
+queue.mem:
+  events: 65535
+logging.metrics.enabled: false
+monitoring.enabled: false
+monitoring.cluster_uuid: "P-92w7JPQKGrFhE1ozrdrQ"
+monitoring.elasticsearch.hosts: ["http://18.132.189.208:9200"]
+monitoring.elasticsearch.username: beats_system
+monitoring.elasticsearch.password: ESh5QveuUyps4uWIPzms
+setup.kibana:
+  host: "http://18.132.189.208:5601"
+  username: "elastic"
+  password: "JJnJ4iNVPRd6x861FKd5"

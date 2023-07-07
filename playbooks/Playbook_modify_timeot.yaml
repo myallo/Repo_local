@@ -1,0 +1,21 @@
+---
+ - name: Modify session-timeout de los tomcats a 30 segundos
+   hosts: all
+   remote_user: ansible
+   become: true
+   tasks:
+    - name: Sacamos el home de cada tomcat que se esta ejecutando en la maquina y los guardamos en la variable homes
+      shell: ps -fe | grep tomcat | grep -v alira | grep java | grep -v grep | awk -F ' ' '{print $9}' | awk -F'=' '{print $2}' | cut -d '/' -f 1,2,3,4
+      register: homes
+    - name: Modify timeout to 30 seg
+      #ansible.builtin.debug:
+      #  msg: "Modificamos el valor del timeout de {{ item }}/web.xml le fijamos a 30"
+      
+    #- name: Modificamos el valor del timeout de cada web.xml a 30 segundos
+      lineinfile:
+        dest: "{{ item }}/web.xml"
+        state: present
+        regexp: '        <session-timeout>720</session-timeout>'
+        line: '        <session-timeout>30</session-timeout>'
+        backup: yes
+      loop: "{{ homes.stdout_lines }}"

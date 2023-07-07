@@ -1,0 +1,11 @@
+---
+ - name: Playbook_despliegue_usuario
+   hosts: all
+   remote_user: ansible
+   become: true
+   tasks:
+     - name: Copy from local to remote (will overwritte)
+       ansible.builtin.copy:
+         src: /etc/ansible/recursos/pageonline.sh
+         dest: /etc/httpd/pagesonline.sh
+         follow: yes   

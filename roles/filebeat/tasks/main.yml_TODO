@@ -1,0 +1,14 @@
+---
+# tasks file for /etc/ansible/roles/filebeat
+- name: Add elastic.co key
+  ansible.builtin.rpm_key:
+    state: present
+    key: https://packages.elastic.co/GPG-KEY-elasticsearch
+- name: Add elastic.co repository
+  ansible.builtin.yum_repository:
+    name: elasticstack.repo
+    description: elasticstack-repo
+    baseurl: https://artifacts.elastic.co/packages/8.x/yum
+    gpgcheck: 1
+    gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    enabled: 1

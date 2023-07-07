@@ -1,0 +1,16 @@
+### Este Playbook obtiene del inventario donde se ejecute todos los datos de las máquinas y el entorno donde estén. A nivel de filtrado, para tener una salida ordenada usamos el módulo debug para sacar
+### el resutaldo de las variables. Podemos obtener las variables que deseemos para filtrar en la siguiente url: https://docs.ansible.com/ansible/latest/user_guide/playbooks_vars_facts.html
+---
+ - name: Obtener versión del Kernel, distrubición y OS
+   hosts: all 
+   user: ansible
+   become: yes
+   gather_facts: false
+   tasks:
+     - name: Obtener versión del Kernel, distrubición y OS
+       ansible.builtin.setup:
+     - ansible.builtin.debug:
+          msg: 
+            - "Sistema operativo: {{ ansible_distribution }}"
+            - "Versión sistema operativo: {{ ansible_distribution_version }}"
+            - "Versión kernel SO: {{ ansible_kernel_version }}" 

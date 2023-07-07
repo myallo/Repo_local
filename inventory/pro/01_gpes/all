@@ -1,0 +1,23 @@
+[gpes:children]
+dbservers
+webservers
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[dbmasters]
+dbmaster-gpes ansible_ssh_host=188.210.217.15 replication_address=192.168.2.2
+
+[dbslaves]
+dbslave1-gpes ansible_ssh_host=188.210.217.152 replication_address=192.168.2.2
+dbslave2-gpes ansible_ssh_host=188.210.217.153 replication_address=192.168.2.3
+dbslave3-gpes ansible_ssh_host=188.210.217.161 replication_address=192.168.2.4
+
+[webservers]
+webserver1-gpes ansible_ssh_host=188.210.217.150
+
+[all:vars]
+vm_vapp_name = GoldenPark PROD
+vm_edge_gateway_name = EDGE_goldenpark
+tenant = GoldenPark

@@ -1,0 +1,77 @@
+- name: Install bottle python package
+  ansible.builtin.pip:
+    name: pyvcloud
+  delegate_to: 127.0.0.1
+  become: false
+
+- name: create vCD edge gateway firewall
+  vcd_gateway_services:
+    vdc: "{{vcloud_vdc}}"
+    host: "{{vcloud_host}}"
+    org: "{{vcloud_org}}"
+    user: "{{vcloud_user}}"
+    password: "{{vcloud_password}}"
+    api_version: "{{vcloud_api_version}}"
+    gateway: "{{vm_edge_gateway_name}}"
+    service: firewall
+    state: present
+    service_params:
+    - name: "Prometheus apache_exporter access for {{vm_name}}"
+      action: accept
+      type: User
+      enabled: True
+      logging_enabled: False
+      source_values:
+       - ipset:
+         - "Prometheus"
+      destination_values:
+       - ip:
+         - "{{vm_public_ip}}"
+      services:
+       - tcp:
+           source_port: any
+           destination_port: 9117
+  delegate_to: 127.0.0.1
+  become: false
+  async: 500
+
+- name: Add NAT rule
+  delegate_to: 127.0.0.1
+  become: false
+  async: 500
+  vcd_gateway_services:
+    vdc: "{{vcloud_vdc}}"
+    host: "{{vcloud_host}}"
+    org: "{{vcloud_org}}"
+    user: "{{vcloud_user}}"
+    password: "{{vcloud_password}}"
+    api_version: "{{vcloud_api_version}}"
+    gateway: "{{vm_edge_gateway_name}}"
+    service: nat_rule
+    service_params:
+    - action: dnat
+      original_address: "{{vm_public_ip}}"
+      original_port: 9117
+      translated_address: "{{hostvars[inventory_hostname]['ansible_default_ipv4']['address']}}"
+      translated_port: 9117
+      protocol: tcp
+      enabled: true
+      description: "apache_exporter nat rule for {{ vm_name }}"
+    state: present
+
+- name: set metadata for vm
+  delegate_to: 127.0.0.1
+  become: false
+  vcd_vapp_vm:
+    target_vdc: "{{vcloud_vdc}}"
+    host: "{{vcloud_host}}"
+    org: "{{vcloud_org}}"
+    user: "{{vcloud_user}}"
+    password: "{{vcloud_password}}"
+    api_version: "{{vcloud_api_version}}"
+    target_vm_name: "{{vm_name}}"
+    target_vapp: "{{vm_vapp_name}}"
+    metadata:
+      tenant: "{{tenant}}"
+      apache_exporter_url: "{{vm_public_ip}}:9117"
+    operation: set_meta

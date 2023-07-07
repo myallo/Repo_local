@@ -1,0 +1,22 @@
+[solcas:children]
+dbservers
+webservers
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+webserver1-solcas ansible_host=185.76.212.234  ansible_port=22
+
+[dbmasters]
+dbmaster-solcas ansible_host=185.76.212.235  ansible_port=22
+
+[dbslaves]
+dbslave1-solcas ansible_host=185.76.212.236  ansible_port=22
+dbslave2-solcas ansible_host=1185.76.212.237  ansible_port=22
+
+[all:vars]
+vm_vapp_name = StarCasino PRO
+vm_edge_gateway_name = EDGE_STARCASINO
+tenant = STARCASINO

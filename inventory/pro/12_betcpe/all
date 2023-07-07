@@ -1,0 +1,24 @@
+[betcpe:children]
+dbservers
+webservers
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+webserver1-betcpe ansible_host=185.190.108.230  ansible_port=22
+webserver2-betcpe ansible_host=185.190.108.233  ansible_port=22
+
+
+[dbservers]
+dbmaster-betcpe ansible_host=185.190.108.231  ansible_port=22
+
+[dbslaves]
+dbslave1-betcpe ansible_host=185.190.108.232  ansible_port=22
+dbslave2-betcpe ansible_host=185.190.108.233 ansible_port=22
+
+[all:vars]
+vm_vapp_name = BETCRUSH_PROD
+vm_edge_gateway_name = EDGE_CGMPERU
+tenant = BETCRUSH

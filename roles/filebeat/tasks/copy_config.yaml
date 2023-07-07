@@ -1,0 +1,6 @@
+---
+- name: Backup de {{ config_destino }} y Copy {{ config_origen }}  usando {{ config_destino }}
+  copy:
+    src: "{{ config_origen }}"
+    dest: "{{ config_destino }}"
+    backup: yes

@@ -1,0 +1,16 @@
+### Este Playbook actualiza el sistema y todos los paquetes instalados a la última versión y después reinicia el sistema.
+---
+ - name: Actualizar sistema operativo
+   hosts: all
+#   hosts: dev-environment,pre-environment,pro-environment 
+   user: ansible
+   become: yes
+   tasks:
+     - name: Actualizar sistema
+       ansible.builtin.yum:
+         name: '*'
+         state: latest
+         update_cache: yes
+     - name: Reiniciar sistema
+       ansible.builtin.reboot:
+         msg: "Reinicio por Ansible"

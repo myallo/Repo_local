@@ -1,0 +1,59 @@
+### Explicación playbook: Este playbook se ha creado para la creacón de  'N' usuarios definidos en el fichero /etc/ansible/recursos/variables/vars2.yml que contendrá
+### tantas entradas como usuarios se deseen crear. las variables declaradas contendrán lo siguiente:
+### usuario: 'nombre_usuario' clave: 'valor clave pública usuario' También se define por defecto la creación del home y del fichero que alojará la clave pública.
+### Se pueden definir tantas variables como se deseen y reutilizar este playbook para futuras configuraciones.
+---
+ - name: Playbook_despliegue_usuario_SFTP_Vars
+   hosts: all
+   remote_user: ansible
+   vars_files:
+       - "/etc/ansible/recursos/variables/vars_SFTP.yml"
+   become: true
+   tasks:
+     - name: crear_grupo_sftponly
+       ansible.builtin.group:
+         name: sftponly
+         state: present
+
+     - name: crear_usuario_{{item.usuario}}
+       ansible.builtin.user:
+         name: "{{ item.usuario }}"
+         state: present
+         shell: /bin/false
+         groups: sshusers, sftponly
+       with_items: "{{ user_details }}"
+
+     - name: crear_carpeta_ssh
+       ansible.builtin.file:
+         path: "/home/{{ item.usuario }}/.ssh"
+         state: directory
+         mode: "0700"
+         owner: "{{ item.usuario }}"
+         group: "{{ item.usuario }}"
+       with_items: "{{ user_details }}"
+
+     - name: crear_authorized_keys
+       ansible.builtin.copy:
+         dest: "/home/{{ item.usuario }}/.ssh/authorized_keys"
+         content: "{{ item.clave }}"
+         mode: "0400"
+         owner: "{{ item.usuario }}"
+         group: "{{ item.usuario }}"
+       with_items: "{{ user_details }}"
+
+     - name: (CREAR LA JAULA)  Cambiar permisos al directorio /home/{{item.usuario}}
+       ansible.builtin.file:
+         path: "/home/{{ item.usuario }}"
+         state: directory
+         owner: root
+         group: root
+         mode: "0755"
+       with_items: "{{ user_details }}"
+
+     - name: Cambiar permisos al directorio /home/{{item.carpeta}}
+       ansible.builtin.file:
+         path: "/home/{{ item.usuario }}/{{ item.carpeta }}"
+         state: directory
+         owner: "{{ item.usuario }}"
+         group: sftponly
+       with_items: "{{ user_details }}"

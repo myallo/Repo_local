@@ -1,0 +1,38 @@
+- name: install node exporter
+  hosts: node
+  tags: nexporter
+  become: yes
+  roles:
+  - node-exporter
+  vars:
+  - arch: amd64
+  - ansible_python_interpreter: /usr/bin/python3
+
+
+- name: install prometheus/grafana
+  hosts: monito
+  tags: monitor
+  become: yes
+  roles:
+  - prometheus
+  - grafana
+  - traefik
+
+- name: install mysql exporter
+  hosts: mysql
+  tags: mysql
+  become: yes
+  roles:
+  - mysql-exporter
+
+
+- name: install apache exporter
+  hosts: webservers
+  tags: webserver
+  become: yes
+  roles:
+  - apache-exporter
+
+  vars:
+  - arch: amd64
+  - ansible_python_interpreter: /usr/bin/python3

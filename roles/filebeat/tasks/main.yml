@@ -1,0 +1,10 @@
+---
+# tasks file for /etc/ansible/roles/filebeat
+#- import_tasks: add_repo.yaml
+#- import_tasks: add_key.yaml
+#- import_tasks: install_filebeat.yaml
+- import_tasks: copy_config.yaml
+- import_tasks: modify_config.yaml
+#- import_tasks: create_dir.yaml
+#- import_tasks: copy_service.yaml
+- import_tasks: start_service.yaml

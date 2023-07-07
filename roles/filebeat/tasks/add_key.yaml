@@ -1,0 +1,5 @@
+---
+- name: Add key for {{ aplicacion }}
+  ansible.builtin.rpm_key:
+    state: absent
+    key: https://packages.elastic.co/GPG-KEY-elasticsearch

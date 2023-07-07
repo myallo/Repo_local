@@ -1,0 +1,11 @@
+---
+# vars file for /etc/ansible/roles/filebeat
+aplicacion: filebeat-7.8.1
+version_app: 7.8.1
+repo_url: https://artifacts.elastic.co/packages/7.x/yum
+gpg_key: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+config_origen: /etc/ansible/roles/filebeat/files/filebeat.alira.yml
+config_destino: /etc/filebeat/filebeat.alira.yml
+service_origen: /etc/ansible/roles/filebeat/files/filebeat-alira
+service_destino: /etc/init.d/filebeat-alira
+service: filebeat-alira

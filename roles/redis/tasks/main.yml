@@ -1,0 +1,10 @@
+---
+# tasks file for /etc/ansible/roles/redis
+- import_tasks: install_app.yaml
+- import_tasks: modify_config.yaml
+- import_tasks: start_service_redis.yaml
+#- import_tasks: create_dir.yaml
+- import_tasks: create_config_munin.yaml
+- import_tasks: start_service_munin.yaml
+#- import_tasks: restart_service.yaml
+#- import_tasks: delete_cron.yaml

@@ -1,0 +1,23 @@
+[enjoycl:children]
+dbservers
+webservers
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+webserver1-enjoycl ansible_host=185.190.108.240  ansible_port=22
+
+
+[dbmasters]
+dbmaster-enjoycl ansible_host=185.190.108.241  ansible_port=22
+
+[dbslaves]
+dbslave1-enjoycl ansible_host=185.190.108.242 ansible_port=22
+dbslave2-enjoycl ansible_host=185.190.108.243 ansible_port=22
+
+[all:vars]
+vm_vapp_name = ENJOY
+vm_edge_gateway_name = EDGE_ENJOY
+tenant = ENJOY

@@ -1,0 +1,22 @@
+[jokerb:children]
+dbservers
+webservers
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+webserver-01 ansible_host=185.76.215.95  ansible_port=22
+
+[dbmaster]
+dbmaster-jokerb ansible_host=185.76.215.96  ansible_port=22
+
+[dbslaves]
+dbslave1-jokerb ansible_host=185.76.215.97  ansible_port=22
+dbslave2-jokerb ansible_host=185.76.215.98  ansible_port=22
+
+[all:vars]
+vm_vapp_name = JOKERBET PROD
+vm_edge_gateway_name = EDGE_JOKERBET
+tenant = JOKERBET

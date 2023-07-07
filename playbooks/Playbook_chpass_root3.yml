@@ -1,0 +1,21 @@
+---
+ - name: Playbook_chpass_root
+   hosts: all
+   remote_user: ansible
+   become: true
+   
+   tasks:
+     - name: Ejecutar get_password.sh
+       command: sh /etc/ansible/recursos/variebales/root_passwd.sh
+       register: vault_password_output
+
+     - name: Acceder a secreto desde vault
+       set_fact:
+         ROOT_PASSWORD: "{{ vault_password_output.stdout }}"
+
+     - name: Cambiar password de root
+       ansible.builtin.user:
+         name: root
+         state: present
+         password: "{{ ROOT_PASSWORD | password_hash('sha512') }}"
+

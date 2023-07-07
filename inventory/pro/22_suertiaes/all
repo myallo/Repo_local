@@ -1,0 +1,23 @@
+[suertiaes:children]
+dbservers
+webservers
+
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+www1-suertiaes ansible_host=185.190.108.146 ansible_port=22
+
+[dbmasters]
+dbmaster-suertiaes ansible_host=185.190.108.147  ansible_port=22
+
+[dbslaves]
+dbslave1-suertiaes ansible_host=185.190.108.148 ansible_port=22
+dbslave2-suertiaes ansible_host=185.190.108.149 ansible_port=22
+
+[all:vars]
+vm_vapp_name = SUERTIA
+vm_edge_gateway_name = EDGE_SUERTIA
+tenant = SUERTIA

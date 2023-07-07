@@ -1,0 +1,10 @@
+---
+# vars file for redis
+aplicacion: redis
+service_redis: redis
+service_munin: munin
+config_origen: /etc/ansible/roles/redis/files/redis_127.0.0.1_6379
+config_destino: /usr/share/munin/plugins/redis_127.0.0.1_6379
+munin_file: /etc/munin/plugins/redis_127.0.0.1_6379
+ip_server: "{{ ansible_facts.ens192.ipv4.address }}"
+

@@ -1,0 +1,7 @@
+- name: Include tenant variables
+  include_vars: tenants.yml
+
+- name: Ensure Tenant exists
+  netbox.netbox.nb_tenants:
+    state: present
+    data:

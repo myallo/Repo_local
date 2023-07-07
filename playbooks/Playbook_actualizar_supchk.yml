@@ -1,0 +1,40 @@
+---
+- name: Actualizar o instalar yum-utils si no esta disponible
+  hosts: all
+  gather_facts: true
+  become: true
+  tasks:
+   - name: Instalar o actualizar yum-utils
+     yum:
+       name: yum-utils
+       state: latest
+
+
+- name: Obtener actualizaciones de seguridad disponibles
+  hosts: all
+  gather_facts: no
+  become: no
+  tasks:
+  - name: Comprobando
+    yum:
+      list: updates
+      update_cache: yes
+      security: yes
+      bugfix: no
+    register: result
+
+  - name: Show result
+    debug:
+      msg: "{{ result }}"
+
+  - name: Gather available security updates
+    shell:
+      cmd: yum updateinfo list security
+      warn: false
+    register: result
+    changed_when: false
+    failed_when: result.rc != 0
+
+  - name: Show result
+    debug:
+      msg: "{{ result.stdout }}"

@@ -1,0 +1,172 @@
+---
+# tasks file for roles/mysql-exporter
+- name: collect facts about system services
+  service_facts:
+  register: services_state
+  
+# add user to database
+- name: install python 3 dependencies (Oracle Linux 8)
+  yum:
+    name: 
+      - python3-PyMySQL
+      - python3-cryptography
+    state: present
+  when: "ansible_distribution|string == 'OracleLinux' and ansible_distribution_major_version|string == '8'"
+
+- name: install python 3 dependencies (Centos 7)
+  yum:
+    name: 
+      - python36-PyMySQL
+      - python36-cryptography
+    state: present
+  when: "ansible_distribution|string == 'CentOS' and ansible_distribution_major_version|string == '7'"
+
+- name: generate random password
+  set_fact:
+    mysql_password: "{{ lookup('password', 'passwords.txt') }}"
+
+- name: create a mysql user with a random password
+  community.mysql.mysql_user:
+    login_user: root
+    login_password: "{{mysqld_exporter_mysql_root_password}}"
+    login_unix_socket: /var/lib/mysql/mysql.sock
+    name: "prom_mysqld_exporter"
+    host: '127.0.0.1'
+    password: "{{ mysql_password }}"
+    priv: 
+      '*.*': 'PROCESS,REPLICATION CLIENT'
+      'performance_schema.*': 'SELECT'
+    resource_limits:
+      MAX_USER_CONNECTIONS: 3
+
+# install the exporter
+- name: check if mysql exporter exist
+  stat:
+    path: "{{ mysqld_exporter_bin }}"
+  register: __check_mysqld_exporter_present
+
+- name: if mysql exporter exist get version
+  shell: "cat /etc/systemd/system/mysqld_exporter.service | grep Version | sed s/'.*Version '//g"
+  register: __get_mysqld_exporter_version
+  when: __check_mysqld_exporter_present.stat.exists == true
+  changed_when: false
+
+- name: create mysql exporter user
+  user:
+    name: "{{ mysqld_exporter_user }}"
+    append: true
+    shell: /usr/sbin/nologin
+    system: true
+    create_home: false
+    home: /
+
+- name: create mysql exporter config dir
+  file:
+    path: "{{ mysqld_exporter_dir_conf }}"
+    state: directory
+    owner: "{{ mysqld_exporter_user }}"
+    group: "{{ mysqld_exporter_group }}"
+
+- name: download and unzip mysql exporter if not exist
+  unarchive:
+    src: "https://github.com/prometheus/mysqld_exporter/releases/download/v{{ mysqld_exporter_version }}/mysqld_exporter-{{ mysqld_exporter_version }}.linux-{{ arch }}.tar.gz"
+    dest: /tmp/
+    remote_src: yes
+    validate_certs: false
+  when: __check_mysqld_exporter_present.stat.exists == false or not __get_mysqld_exporter_version.stdout == mysqld_exporter_version
+
+- name: move the binary to the final destination
+  copy:
+    src: "/tmp/mysqld_exporter-{{ mysqld_exporter_version }}.linux-{{ arch }}/mysqld_exporter"
+    dest: "{{ mysqld_exporter_bin }}"
+    owner: "{{ mysqld_exporter_user }}"
+    group: "{{ mysqld_exporter_group }}"
+    mode: 0755
+    remote_src: yes
+  when: __check_mysqld_exporter_present.stat.exists == false or not __get_mysqld_exporter_version.stdout == mysqld_exporter_version
+
+- name: Create private key (RSA, 4096 bits)
+  community.crypto.openssl_privatekey:
+    path: "{{mysqld_exporter_ssl_key}}"
+
+- name: Create certificate signing request (CSR) for self-signed certificate
+  community.crypto.openssl_csr_pipe:
+    privatekey_path:  "{{mysqld_exporter_ssl_key}}"
+    common_name: mysqld_exporter.tecnalis.com
+    organization_name: Tecnalis
+    subject_alt_name:
+      - "DNS:mysqld_exporter.tecnalis.com"
+  register: csr
+
+- name: Generate a Self Signed OpenSSL certificate
+  community.crypto.x509_certificate:
+    path: "{{mysqld_exporter_ssl_cert}}"
+    csr_content: "{{ csr.csr }}"
+    privatekey_path: "{{mysqld_exporter_ssl_key}}"
+    provider: selfsigned
+
+- name: create the tls conf for mysql exporter
+  template:
+    src: mysqld_exporter_web.yml.j2
+    dest: "{{ mysqld_exporter_web_yml_conf }}"
+    owner: "{{ mysqld_exporter_user }}"
+    group: "{{ mysqld_exporter_group }}"
+    mode: 0555
+
+- name: change cert files owner to mysql exporter
+  ansible.builtin.file:
+    path: '{{ item }}'
+    owner: "{{ mysqld_exporter_user }}"
+    group: "{{ mysqld_exporter_group }}"
+  loop:
+    - "{{mysqld_exporter_ssl_cert}}"
+    - "{{mysqld_exporter_ssl_key}}"
+
+- name: Apply new SELinux file context to filesystem
+  ansible.builtin.command: restorecon -rv {{mysqld_exporter_bin}}
+
+- name: install env file
+  template:
+    src: db.env.j2
+    dest: "{{ mysqld_exporter_env_conf }}"
+    owner: "{{ mysqld_exporter_user }}"
+    group: "{{ mysqld_exporter_group }}"
+    mode: 0550
+
+- name: install service
+  template:
+    src: mysqld_exporter.service.j2
+    dest: /usr/lib/systemd/system/mysqld_exporter.service
+    owner: root
+    group: root
+    mode: 0755
+  notify: reload_daemon_and_restart_mysqld_exporter
+
+- meta: flush_handlers
+
+- name: clean
+  file:
+    path: 
+      - /tmp/mysqld_exporter-{{ mysqld_exporter_version }}.linux-amd64/
+      - 'passwords.txt'
+    state: absent
+
+- name: service always started
+  systemd:
+    name: mysqld_exporter
+    state: started
+    enabled: yes
+
+- name: Open port if firewall is active
+  firewalld:
+      port: "9104/tcp"
+      permanent: yes
+      immediate: yes
+      offline: no
+      state: enabled
+  when: 
+      - ansible_facts.services['firewalld.service'].state == 'running'
+      - ansible_facts.services['firewalld.service'].status == 'enabled'
+
+- include_tasks: vcloud.yml
+  when: configure_vcloud is defined and configure_vcloud == true

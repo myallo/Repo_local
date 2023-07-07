@@ -1,0 +1,23 @@
+[betwaypt:children]
+dbservers
+webservers
+
+[dbservers:children]
+dbmasters
+dbslaves
+
+[webservers]
+webserver1-betwaypt ansible_host=185.190.108.166  ansible_port=22
+
+
+[dbmasters]
+dbmater-betwaypt ansible_host=185.190.108.167  ansible_port=22
+
+[dbslaves]
+dbslave1-betwaypt ansible_host=185.190.108.168  ansible_port=22
+dbslave2-betwaypt ansible_host=185.190.108.169 ansible_port=22
+
+[all:vars]
+vm_vapp_name = BETWAY-PT
+vm_edge_gateway_name = EDGE_BETWAY_PT
+tenant = BETWAY-PT
