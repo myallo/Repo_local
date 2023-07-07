@@ -1,0 +1,43 @@
+---
+ - name: Copia de ficheros para la subidas a PRE
+   hosts: all
+   remote_user: ansible
+   vars:
+     tstamp: "{{ lookup('pipe', 'date +%m-%d-%Y') }}"
+     config_origen: /etc/ansible/recursos/Subida_PRE/Subida_PRE_{{ tstamp }}.zip
+     dir_destino: /home/jparedes/Subidas/{{ tstamp }}/
+   become: true
+   tasks:
+   - block:
+     - name: Check dir {{ dir_destino }}
+       stat:
+         path: "{{ dir_destino }}"
+       register: directory_data
+     - name: "echo if directory already existed"
+       debug:
+         msg: "{{ dir_destino }} directory is already existed"
+       when: directory_data.stat.exists
+     - name: create dir if it doesn't exist
+       ansible.builtin.file:
+         path: "{{ dir_destino }}"
+         state: directory
+         mode: '0755'      
+         owner: jparedes
+         group: jparedes
+       when: not directory_data.stat.exists
+#     - name: copiamos {{ config_origen }}  a {{ dir_destino }}
+#       ansible.builtin.copy:
+#         src: "{{ config_origen }}"
+#         dest: "{{ dir_destino }}"
+#         mode: '0744'        
+#         owner: jparedes
+#         group: jparedes
+     - name: untar {{ dir_destino }}Subida_PRE_{{ tstamp }}.zip
+       ansible.builtin.unarchive:
+         src: "{{ dir_destino  }}Subida_PRE_{{ tstamp }}.zip"
+         dest: "{{ dir_destino }}"
+         remote_src: yes
+     - name: delete remote tgz -> {{ dir_destino }}Subida_PRE_{{ tstamp }}.zip
+       ansible.builtin.file:
+         path: "{{ dir_destino  }}Subida_PRE_{{ tstamp }}.zip"
+         state: absent 

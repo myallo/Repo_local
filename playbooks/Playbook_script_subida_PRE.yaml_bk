@@ -1,0 +1,20 @@
+---
+ - name: Copu script subidas a PRE
+   hosts: all
+   remote_user: ansible
+   vars:
+     config_origen: /etc/ansible/recursos/cp_files.sh
+     config_destino: /home/jparedes/Subidas/cp_files.sh
+   become: true
+   tasks:
+    - name: create dir
+      ansible.builtin.file:
+        path: "{{ dir_destino }}"
+        state: directory
+        mode: '0755'      
+    - name: copiamos script a /home/jparedes/Subida
+      ansible.builtin.copy:
+        src: "{{ config_origen }}"
+        dest: "{{ config_destino }}"
+        mode: '0744'        
+        backup: yes

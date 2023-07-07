@@ -12,12 +12,3 @@
       ansible.builtin.debug: 
         msg: Modificamos el valor del timeout de {{ item }}/web.xml le fijamos a 30
       loop: "{{ rutas.stdout_lines }}"
-
-    - name: Modificamos el valor del timeout de cada web.xml 
-      lineinfile:
-        dest: "{{ item }}/web.xml"
-        state: present
-        regexp: '        <session-timeout>720</session-timeout>'
-        line: '        <session-timeout>30</session-timeout>'
-        backup: yes
-      loop: "{{ rutas.stdout_lines }}"
