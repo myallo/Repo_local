@@ -1,0 +1,4 @@
+---
+user_details:
+  - { usuario: 'usr_audit', carpeta: '1059', clave: 'ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAsxFGVOJcREmkiyT7ikV3YnQcDSyJbMCSnheLcUJJNYAV3IrwuyUPwoHF/I1NV0c8LUyFNsByjcaxVTW3mgamZUImaSKXCq5UQIKETWuck+2gHCK7LSy/kFPEv+4zV8rJoOZzW/ye4Dxk6kdjsiiixmgXWbUOXGe8eIuDJN8gf8J4byB3KvAn7CuLCDRtMOfog8nG7lq4cpMPfAWt+cznxGv4bTmHbudyivu5/jWNCA/ykUcW4PqxtXQyuBnSamQqfYlKBodKtvuxNb6gh5R5GsKh6qsuIppvx3h5IZkYdMbYTjEQVhI0yvRn2WAbHnm90HOmcdlpnyFrY+zWjdH9AQ== usr_audit' }
+
